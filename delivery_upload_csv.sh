@@ -1,25 +1,27 @@
-
 #!/usr/bin/bash
 
-# Change working directory.
-cd /home/mhartney/Documents/csv_drafts/new_deliver_csv/
+# This program generates a CSV to upload to Shotgrid deliveries page, using the bulk uploader.
+# It generates two new deliveries for Tech Check and prefills information on each delivery.
 
-# Set variable for date, month and outgoing paths.
+# Change working directory.
+cd /enter/working/directory
+
+# Sets variables for date, month and package's outgoing paths.
 date_month=$(date +"%Y.%m") # Date format YYYY.MM
 date_day=$(date +"%Y.%m.%d") # Date format YYYY.MM.DD
 date=$(date +"%Y%m%d") # Date format YYYYMMDD
 
-outgoing_directory=$(echo "/lucas/ilm/show/paradox/staging/outgoing/to_client/$date_month/$date_day")
-outgoing_dir_month=$(echo "/lucas/ilm/show/paradox/staging/outgoing/to_client/$date_month/")
+outgoing_directory=$(echo "/paths/to/outgoing/directory/$date_month/$date_day")
+outgoing_dir_month=$(echo "/paths/to/outgoing/directory/$date_month/")
 
-# If statement to determine if we've sent a package today or not.
+# If statement to determine if we've sent a media package today or not.
 if [ -d "$outgoing_directory" ]; then
   echo -e "\nOutgoing directory path exists.\n"
 else
   mkdir -p "$outgoing_directory"
 fi
 
-# Get the folder previously created. Which will be yesterday or day before.
+# Get the folder previously created. Which will be yesterday or the day before.
 last_folder=$(find "$outgoing_dir_month" -maxdepth 1 -type d | sort -nr | head -n 2 | tail -n 1)
 
 # Set variables for sum to get new package number.
@@ -64,8 +66,10 @@ echo "$package_info_2" >> csv_file.csv
 awk 'BEGIN{FS=OFS=","}{print $1,"paradox-lon","Client",$3,$2,$4,"Falcon","Final"}' csv_file.csv > csv_file_2.csv
 cat header.csv csv_file_2.csv > new_delivery.csv
 
+# Open CSV file with libreoffice.
 /usr/bin/libreoffice new_delivery.csv
 
+# Remove CSV once information checked and uploaded.
 clear
 echo "done. removing csv."
 rm -f new_delivery.csv
